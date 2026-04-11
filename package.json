@@ -1,0 +1,52 @@
+{
+  "name": "@lsby/playground-ts-app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "lsby-playground-ts-app": "dist/esm/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:all": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsup src/**/*.ts --format cjs --clean --dts -d dist/cjs",
+    "build:esm": "tsup src/**/*.ts --format esm --clean --dts -d dist/esm",
+    "check:all": "npm run check:format && npm run check:lint && npm run check:type",
+    "check:format": "prettier --write .",
+    "check:lint": "eslint . --fix",
+    "check:type": "tsc --noEmit",
+    "check:type:watch": "tsc --noEmit -w",
+    "prepare": "husky",
+    "public": "npm publish --access public",
+    "release": "npm run check:all && npm run test:base && npm run build:all && bumpp",
+    "run:dev": "tsx watch src/index.ts",
+    "run:start": "tsx src/index.ts",
+    "test:base": "vitest run",
+    "test:coverage": "vitest run --coverage && open-cli ./coverage/index.html"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "@lsby/eslint-config": "^0.5.4",
+    "@lsby/eslint-plugin": "^0.2.1",
+    "@types/eslint": "^9.6.1",
+    "@types/node": "^25.2.1",
+    "@vitest/coverage-v8": "^4.0.18",
+    "bumpp": "^10.4.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsdoc": "^62.5.2",
+    "eslint-plugin-sort-class-members": "^1.21.0",
+    "husky": "^9.1.7",
+    "prettier": "3.8.1",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-packagejson": "^3.0.2",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.54.0",
+    "vitest": "^4.0.18"
+  },
+  "packageManager": "pnpm@9.5.0"
+}

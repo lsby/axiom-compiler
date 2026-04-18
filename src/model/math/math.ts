@@ -81,22 +81,15 @@ export abstract class 运算<参数们泛型 extends 表达式<string[]>[]> exte
   }
 
   public 应该为子项加括号文本(子项: 表达式<string[]>): boolean {
-    if (子项 instanceof 运算) {
-      return 子项.获得运算优先级() < this.获得运算优先级()
-    }
-    return false
+    return 子项 instanceof 运算
   }
 
   public 应该为子项加括号Latex(子项: 表达式<string[]>): boolean {
-    if (子项 instanceof 运算) {
-      return 子项.获得运算优先级() < this.获得运算优先级()
-    }
-    return false
+    return 子项 instanceof 运算
   }
 
   public abstract 生成文本表示(子项文本们: string[]): string
   public abstract 生成Latex表示(子项Latex们: string[]): string
-  public abstract 获得运算优先级(): number
   public abstract 计算(运算分量: number[]): number
 }
 

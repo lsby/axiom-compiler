@@ -1,10 +1,6 @@
 import { 表达式, 运算 } from './math.js'
 
 export class 加法运算<参数们泛型 extends 表达式<string[]>[]> extends 运算<参数们泛型> {
-  public 获得运算优先级(): number {
-    return 1
-  }
-
   public 生成文本表示(子项文本们: string[]): string {
     return 子项文本们.join(' + ')
   }
@@ -19,10 +15,6 @@ export class 加法运算<参数们泛型 extends 表达式<string[]>[]> extends
 }
 
 export class 减法运算<参数们泛型 extends 表达式<string[]>[]> extends 运算<参数们泛型> {
-  public 获得运算优先级(): number {
-    return 1
-  }
-
   public 生成文本表示(子项文本们: string[]): string {
     return 子项文本们.join(' - ')
   }
@@ -39,10 +31,6 @@ export class 减法运算<参数们泛型 extends 表达式<string[]>[]> extends
 }
 
 export class 乘法运算<参数们泛型 extends 表达式<string[]>[]> extends 运算<参数们泛型> {
-  public 获得运算优先级(): number {
-    return 2
-  }
-
   public 生成文本表示(子项文本们: string[]): string {
     return 子项文本们.join(' * ')
   }
@@ -57,10 +45,6 @@ export class 乘法运算<参数们泛型 extends 表达式<string[]>[]> extends
 }
 
 export class 除法运算<参数们泛型 extends 表达式<string[]>[]> extends 运算<参数们泛型> {
-  public 获得运算优先级(): number {
-    return 2
-  }
-
   // 除法在latex里写成分数 不需要加括号
   public override 应该为子项加括号Latex(_子项: 表达式<string[]>): boolean {
     return false

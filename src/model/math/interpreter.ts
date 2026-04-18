@@ -17,25 +17,7 @@ function 解释表达式(节点: 表达式<string[]>, 上下文: 环境): number
 
   if (节点 instanceof 运算) {
     let 运算分量 = 节点.参数们.map((项) => 解释表达式(项, 上下文))
-
-    switch (节点.符号) {
-      case '+':
-        return 运算分量.reduce((累积, 当前) => 累积 + 当前, 0)
-      case '-': {
-        let [第一项, ...其余项] = 运算分量
-        if (第一项 === undefined) throw new Error('减法运算至少需要一个操作数')
-        return 其余项.length === 0 ? -第一项 : 第一项 - 其余项.reduce((累积, 当前) => 累积 + 当前, 0)
-      }
-      case '*':
-        return 运算分量.reduce((累积, 当前) => 累积 * 当前, 1)
-      case '/': {
-        let [第一项, ...其余项] = 运算分量
-        if (第一项 === undefined || 其余项.length === 0) {
-          throw new Error('除法运算至少需要两个操作数')
-        }
-        return 其余项.reduce((累积, 当前) => 累积 / 当前, 第一项)
-      }
-    }
+    return 节点.计算(运算分量)
   }
 
   throw new Error('未知的表达式类型')

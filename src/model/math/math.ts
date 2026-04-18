@@ -75,13 +75,29 @@ export class 参数引用<值类型 extends string> extends 表达式<[值类型
     super()
   }
 }
-export class 运算<参数们 extends 表达式<string[]>[]> extends 表达式<计算表达式们允许的变量们<参数们>> {
-  public constructor(
-    public readonly 符号: '+' | '-' | '*' | '/',
-    public readonly 参数们: [...参数们],
-  ) {
+export abstract class 运算<参数们泛型 extends 表达式<string[]>[]> extends 表达式<计算表达式们允许的变量们<参数们泛型>> {
+  public constructor(public readonly 参数们: [...参数们泛型]) {
     super()
   }
+
+  public 应该为子项加括号文本(子项: 表达式<string[]>): boolean {
+    if (子项 instanceof 运算) {
+      return 子项.获得运算优先级() < this.获得运算优先级()
+    }
+    return false
+  }
+
+  public 应该为子项加括号Latex(子项: 表达式<string[]>): boolean {
+    if (子项 instanceof 运算) {
+      return 子项.获得运算优先级() < this.获得运算优先级()
+    }
+    return false
+  }
+
+  public abstract 生成文本表示(子项文本们: string[]): string
+  public abstract 生成Latex表示(子项Latex们: string[]): string
+  public abstract 获得运算优先级(): number
+  public abstract 计算(运算分量: number[]): number
 }
 
 type 计算表达式允许的变量们<输入表达式> = 输入表达式 extends 表达式<infer X> ? X : never

@@ -30,30 +30,35 @@ export class Latex渲染器 {
   /**
    * 将 LaTeX 转换为 PNG 二进制数据
    */
-  public static 转换为Png(公式: string, 缩放系数: number = 2): Buffer {
+  public static 转换为Png(公式: string, 缩放系数: number = 2, 背景颜色?: string): Buffer {
     let svg字符串 = Latex渲染器.转换为Svg(公式)
-    let 转换器 = new Resvg(svg字符串, { fitTo: { mode: 'zoom', value: 缩放系数 } })
+    let 转换器 = new Resvg(svg字符串, {
+      fitTo: { mode: 'zoom', value: 缩放系数 },
+      ...(背景颜色 !== undefined ? { background: 背景颜色 } : {}),
+    })
     return 转换器.render().asPng()
   }
 
   /**
-   * 将 LaTeX 渲染并保存为文件 (支持 .svg 和 .png)
+   * 将 LaTeX 渲染并保存为文件
    */
-  public static async 渲染并保存(公式: string, 保存路径: string): Promise<void> {
-    let 扩展名 = 路径库.extname(保存路径).toLowerCase()
+  public static async 渲染并保存(
+    公式: string,
+    参数: { 保存路径: string; 格式: 'svg' | 'png'; 缩放系数?: number; 背景颜色?: string },
+  ): Promise<void> {
+    let { 保存路径, 格式, 缩放系数 = 2, 背景颜色 } = 参数
     let 目标目录 = 路径库.dirname(保存路径)
 
     // 确保目标文件夹存在
     await 文件库.mkdir(目标目录, { recursive: true })
 
-    if (扩展名 === '.svg') {
-      let 内容 = Latex渲染器.转换为Svg(公式)
-      await 文件库.writeFile(保存路径, 内容)
-    } else if (扩展名 === '.png') {
-      let 内容 = Latex渲染器.转换为Png(公式)
-      await 文件库.writeFile(保存路径, 内容)
-    } else {
-      throw new Error(`不支持的文件格式: ${扩展名}`)
+    switch (格式) {
+      case 'svg':
+        await 文件库.writeFile(保存路径, Latex渲染器.转换为Svg(公式))
+        break
+      case 'png':
+        await 文件库.writeFile(保存路径, Latex渲染器.转换为Png(公式, 缩放系数, 背景颜色))
+        break
     }
   }
 }

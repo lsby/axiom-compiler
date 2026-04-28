@@ -49,9 +49,9 @@ export class 函数<
   }
 }
 
-export class 不动点函数<const 参数类型 extends 任意的数据> extends 表达式<计算数据包含符号<参数类型>, any> {
+export class 不动点函数<const 参数类型 extends 任意的数据, 返回值> extends 表达式<计算数据包含符号<参数类型>, 返回值> {
   public constructor(
-    private 我的不动点: 不动点<any, any, any>,
+    private 我的不动点: 不动点<any, any, 返回值>,
     private 我的参数: 参数类型,
     private 纯文本格式化: (参数: 任意的表达式[]) => string,
     private Latex格式化: (参数: 任意的表达式[]) => string,
@@ -62,16 +62,16 @@ export class 不动点函数<const 参数类型 extends 任意的数据> extends
   public override 代换<S extends 计算数据包含符号<参数类型> | (string & {}), R extends 任意的表达式>(
     符号名: S,
     替换物: R,
-  ): any {
+  ): 不动点函数<替换数据符号<参数类型, S, 计算表达式包含符号<R>>, 返回值> {
     return new 不动点函数(
       this.我的不动点,
       this.我的参数.代换(符号名, 替换物) as any,
       this.纯文本格式化,
       this.Latex格式化,
-    )
+    ) as any
   }
 
-  public override 求值(): any {
+  public override 求值(): 返回值 {
     let 参数值 = this.我的参数.获得各项().map((项: any) => 项.求值())
     return this.我的不动点.应用(参数值)
   }

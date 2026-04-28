@@ -1,18 +1,18 @@
 import z from 'zod/v3'
 import { 值, 数据, 符号 } from './model/base/base.js'
 import { 排序 } from './model/math/algorithm.js'
-import { 加法, 除法 } from './model/math/constructor.js'
+import { 加法算子, 除法算子 } from './model/math/constructor.js'
 import { 函数 } from './model/math/function.js'
 import { Latex渲染器 } from './model/renderer/latex-renderer.js'
 
 // 加法
-let 加法函数 = new 函数(加法, new 数据([new 符号('a', z.number()), new 符号('b', z.number())]))
+let 加法函数 = new 函数(加法算子, new 数据([new 符号('a', z.number()), new 符号('b', z.number())]))
 console.log('加法 纯文本:', 加法函数.输出文本())
 console.log('加法 Latex:', 加法函数.输出Latex())
 console.log('加法 求值:', 加法函数.代换('a', new 值(1)).代换('b', new 值(2)).求值())
 
 // 除法
-let 除法函数 = new 函数(除法, new 数据([new 符号('a', z.number()), new 符号('b', z.number())]))
+let 除法函数 = new 函数(除法算子, new 数据([new 符号('a', z.number()), new 符号('b', z.number())]))
 console.log('除法 纯文本:', 除法函数.输出文本())
 console.log('除法 Latex:', 除法函数.输出Latex())
 console.log('除法 求值:', 除法函数.代换('a', new 值(10)).代换('b', new 值(2)).求值())

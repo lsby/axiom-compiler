@@ -236,7 +236,7 @@ export class 延迟调用<包含符号 extends string, 返回值类型> extends 
   public override 求值(): 返回值类型 {
     let 求值后参数 = this.参数列表.map((项) => 项.求值())
     let 操作目标 = this.操作表达式
-    // 如果操作位是操作(含构造子), 直接调用
+    // 如果操作位是操作(含算子), 直接调用
     if (操作目标 instanceof 操作) return 操作目标.调用(...求值后参数) as 返回值类型
     // 如果操作位是不动点, 对其进行应用
     if (操作目标 instanceof 不动点) return 操作目标.应用(求值后参数)

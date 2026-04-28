@@ -1,23 +1,65 @@
-import z from 'zod/v3'
-import { 值, 数据, 符号, 调用 } from './model/base/base.js'
-import { 乘法, 加法, 除法 } from './model/math/math.js'
+import { 值, 操作, 数据, 调用 } from './model/base/base.js'
 import { Latex渲染器 } from './model/renderer/latex-renderer.js'
 
-let x = new 符号('x', z.number())
-let y = new 符号('y', z.number())
-
-let 表达式1 = new 调用(
-  除法,
-  new 数据([new 调用(加法, new 数据([x, new 值(50)])), new 调用(乘法, new 数据([y, new 值(2)]))]),
+let 插入: 操作<'insert', [number, number[]], number[]> = new 操作(
+  'insert',
+  (x: number, arr: number[]): number[] => {
+    if (arr.length === 0) return [x]
+    let [y, ...ys] = arr
+    if (y === undefined) throw new Error('意外的空值')
+    return x <= y ? [x, ...arr] : [y, ...插入.调用(x, ys)]
+  },
+  (p) => `insert(${p[0]}, [${p[1]}])`,
+  (p) => String.raw`
+    \mathrm{insert}(${p[0]}, [${p[1]}]) =
+    \begin{cases}
+      [${p[0]}] & \text{if } [${p[1]}] = [] \\
+      [${p[0]}, \ldots [${p[1]}]] & \text{if } ${p[0]} \le y \\
+      [头([${p[1]})], \ldots insert(${p[0]}, 尾([${p[1]}])] & \text{否则}
+    \end{cases}
+  `,
 )
-console.log('表达式1 纯文本:', 表达式1.转纯文本())
-console.log('表达式1 Latex:', 表达式1.转Latex())
-await Latex渲染器.渲染并保存(表达式1.转Latex(), { 保存路径: './data/expression.png', 格式: 'png', 背景颜色: 'white' })
-console.log('图片已保存到 ./data/expression.png')
 
-let 表达式2 = 表达式1.代换('x', new 值(50))
-console.log('表达式2 纯文本:', 表达式2.转纯文本())
+let 排序: 操作<'sort', [number[]], number[]> = new 操作(
+  'sort',
+  (arr: number[]): number[] => {
+    if (arr.length === 0) return []
+    let [x, ...xs] = arr
+    if (x === undefined) throw new Error('意外的空值')
+    return 插入.调用(x, 排序.调用(xs))
+  },
+  (p) => `sort(${p[0]})`,
+  (p) => String.raw`
+  \begin{aligned}
+    & ${插入.格式化Latex(['x', 'arr'])} \\
+    & \mathrm{sort}([${p[0]}]) =
+      \begin{cases}
+        [] & \text{if } [${p[0]}] = [] \\
+        \mathrm{insert}\bigl(头([${p[0]}]), \mathrm{sort}(尾([${p[0]}]))\bigr) & \text{否则}
+      \end{cases}
+    \end{aligned}
+  `,
+)
 
-let 表达式3 = 表达式2.代换('y', new 值(1))
-console.log('表达式3 纯文本:', 表达式3.转纯文本())
-console.log('表达式3 求值:', 表达式3.求值())
+let 参数 = new 数据([new 值([3, 1, 5, 6, 9, 3])])
+let 表达式 = new 调用(排序, 参数)
+
+await Latex渲染器.渲染并保存(插入.格式化Latex(['x', 'arr']), {
+  保存路径: './data/img01.png',
+  格式: 'png',
+  背景颜色: 'white',
+})
+await Latex渲染器.渲染并保存(排序.格式化Latex(['arr']), {
+  保存路径: './data/img02.png',
+  格式: 'png',
+  背景颜色: 'white',
+})
+await Latex渲染器.渲染并保存(表达式.转Latex(), {
+  //
+  保存路径: './data/img03.png',
+  格式: 'png',
+  背景颜色: 'white',
+})
+
+console.log('表达式 纯文本:', 表达式.转纯文本())
+console.log('表达式 求值:', 表达式.求值())

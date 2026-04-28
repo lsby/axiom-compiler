@@ -47,7 +47,7 @@ export class 符号<符号名称 extends string, 预期类型zod extends z.ZodTy
     return this as any
   }
   public override 求值(): never {
-    throw new Error('符号没有返回值')
+    throw new Error(`符号 "${this.符号名称}" 尚未代换为具体数值, 无法求值`)
   }
   public override 转纯文本(): string {
     return this.符号名称
@@ -58,8 +58,7 @@ export class 符号<符号名称 extends string, 预期类型zod extends z.ZodTy
 }
 // type 任意的符号 = 符号<any, any>
 
-// 暂时只有数字可以封装为值
-export class 值<const 值类型 extends number> extends 表达式<never, 值类型> {
+export class 值<值类型> extends 表达式<never, 值类型> {
   public constructor(private 值: 值类型) {
     super()
   }
@@ -90,15 +89,15 @@ export class 操作<操作名称 extends string, const 参数类型 extends any[
     super()
   }
 
-  public 获得实现(): (...参数: [...参数类型]) => 返回值类型 {
-    return this.实现
+  public 调用(...参数: [...参数类型]): 返回值类型 {
+    return this.实现(...参数)
   }
 
   public override 代换<S extends never, R extends 任意的表达式>(_符号名: S, _替换物: R): 表达式<never, never> {
     return this
   }
   public override 求值(): never {
-    throw new Error('操作没有返回值')
+    throw new Error(`操作 "${this.操作名称}" 无法直接求值, 请通过 "调用" 类来执行该操作`)
   }
   public 格式化纯文本(参数: string[]): string {
     return this.纯文本格式化(参数)
@@ -153,7 +152,16 @@ type 计算数据包含符号<T> = T extends 数据<infer Arr> ? 计算表达式
 
 // 调用是操作与参数组成的结构
 export class 调用<
-  操作类型 extends 类型限制<继承<计算数据返回值类型<参数类型>, 计算操作参数类型<操作类型>>, any, '参数不匹配'>,
+  操作类型 extends 类型限制<
+    继承<计算数据返回值类型<参数类型>, 计算操作参数类型<操作类型>>,
+    any,
+    {
+      错误: '调用操作时参数类型不匹配'
+      操作名称: 操作类型 extends 操作<infer N, any, any> ? N : '未知操作'
+      期待的参数类型: 计算操作参数类型<操作类型>
+      实际传入的参数类型: 计算数据返回值类型<参数类型>
+    }
+  >,
   const 参数类型 extends 任意的数据,
 > extends 表达式<计算数据包含符号<参数类型>, 计算操作返回值类型<操作类型>> {
   public constructor(
@@ -169,7 +177,7 @@ export class 调用<
     return new 调用(this.操作, this.参数.代换(符号名, 替换物) as any) as any
   }
   public override 求值(): 计算操作返回值类型<操作类型> {
-    return (this.操作.获得实现() as Function)(...this.参数.求值().map((项: any) => 项.求值()))
+    return this.操作.调用(...this.参数.求值().map((项: any) => 项.求值()))
   }
   public override 转纯文本(): string {
     return this.操作.格式化纯文本(this.参数.转各项纯文本())

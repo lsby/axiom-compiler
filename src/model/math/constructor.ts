@@ -1,4 +1,4 @@
-import { 不动点, 任意的表达式, 值, 延迟调用, 操作, 条件表达式, 符号 } from '../base/base.js'
+import { 不动点, 任意的表达式, 值, 延迟调用, 操作, 数据, 条件表达式, 符号 } from '../base/base.js'
 import { 不动点函数, 函数 } from './function.js'
 
 export function 渲染为文本(项: 任意的表达式 | undefined): string {
@@ -18,7 +18,13 @@ export function 渲染为文本(项: 任意的表达式 | undefined): string {
     return `<延迟调用>`
   }
   if (项 instanceof 不动点) return `fix(${项.获得自引用符号名()})`
-  if (项 instanceof 值) return String(项.求值())
+  if (项 instanceof 值) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    let 原始值 = 项.求值()
+    if (Array.isArray(原始值)) return `[${原始值.join(', ')}]`
+    return String(原始值)
+  }
+  if (项 instanceof 数据) return `[${项.获得各项().map(渲染为文本).join(', ')}]`
   if (项 instanceof 符号) return 项.获得名称()
   throw new Error('无法渲染的表达式类型')
 }
@@ -41,7 +47,13 @@ export function 渲染为Latex(项: 任意的表达式 | undefined): string {
     return `\\text{<延迟调用>}`
   }
   if (项 instanceof 不动点) return `\\mathrm{fix}(${项.获得自引用符号名()})`
-  if (项 instanceof 值) return String(项.求值())
+  if (项 instanceof 值) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    let 原始值 = 项.求值()
+    if (Array.isArray(原始值)) return `[${原始值.join(', ')}]`
+    return String(原始值)
+  }
+  if (项 instanceof 数据) return `[${项.获得各项().map(渲染为Latex).join(', ')}]`
   if (项 instanceof 符号) return 项.获得名称()
   throw new Error('无法渲染的表达式类型')
 }

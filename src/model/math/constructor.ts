@@ -1,5 +1,5 @@
-import { 任意的表达式, 值, 延迟调用, 操作, 条件表达式, 符号 } from '../base/base.js'
-import { 函数 } from './function.js'
+import { 不动点, 任意的表达式, 值, 延迟调用, 操作, 条件表达式, 符号 } from '../base/base.js'
+import { 不动点函数, 函数 } from './function.js'
 
 export function 渲染为文本(项: 任意的表达式 | undefined): string {
   if (项 === undefined) throw new Error('渲染目标不存在')
@@ -10,11 +10,14 @@ export function 渲染为文本(项: 任意的表达式 | undefined): string {
     return `if(${条件文本}, ${真文本}, ${假文本})`
   }
   if (项 instanceof 函数) return 项.输出文本()
+  if (项 instanceof 不动点函数) return 项.输出文本()
   if (项 instanceof 延迟调用) {
     let 操作 = 项.获得操作()
     if (操作 instanceof 构造子) return 操作.格式化纯文本(项.获得参数列表())
+    if (操作 instanceof 不动点) return `${操作.获得自引用符号名()}(${项.获得参数列表().map(渲染为文本).join(', ')})`
     return `<延迟调用>`
   }
+  if (项 instanceof 不动点) return `fix(${项.获得自引用符号名()})`
   if (项 instanceof 值) return String(项.求值())
   if (项 instanceof 符号) return 项.获得名称()
   throw new Error('无法渲染的表达式类型')
@@ -29,11 +32,15 @@ export function 渲染为Latex(项: 任意的表达式 | undefined): string {
     return String.raw`\begin{cases} ${真Latex} & \text{if } ${条件Latex} \\ ${假Latex} & \text{otherwise} \end{cases}`
   }
   if (项 instanceof 函数) return 项.输出Latex()
+  if (项 instanceof 不动点函数) return 项.输出Latex()
   if (项 instanceof 延迟调用) {
     let 操作 = 项.获得操作()
     if (操作 instanceof 构造子) return 操作.格式化Latex(项.获得参数列表())
+    if (操作 instanceof 不动点)
+      return `\\mathrm{${操作.获得自引用符号名()}}(${项.获得参数列表().map(渲染为Latex).join(', ')})`
     return `\\text{<延迟调用>}`
   }
+  if (项 instanceof 不动点) return `\\mathrm{fix}(${项.获得自引用符号名()})`
   if (项 instanceof 值) return String(项.求值())
   if (项 instanceof 符号) return 项.获得名称()
   throw new Error('无法渲染的表达式类型')
@@ -122,43 +129,3 @@ export let 小于等于 = new 构造子(
   (参数): string => `(${渲染为文本(参数[0])} <= ${渲染为文本(参数[1])})`,
   (参数): string => `(${渲染为Latex(参数[0])} \\le ${渲染为Latex(参数[1])})`,
 )
-
-// 递归构造子: 实现由表达式树定义, 支持自引用
-export class 递归构造子<操作名称 extends string, const 参数类型 extends any[], 返回值类型> extends 构造子<
-  操作名称,
-  参数类型,
-  返回值类型
-> {
-  private 表达式体: 任意的表达式
-  private 我的参数符号列表: 符号<any, any>[]
-
-  public constructor(
-    操作名称: 操作名称,
-    参数符号列表: 符号<any, any>[],
-    构建体: (自身: 递归构造子<操作名称, 参数类型, 返回值类型>) => 任意的表达式,
-    纯文本格式化: (参数: 任意的表达式[]) => string,
-    Latex格式化: (参数: 任意的表达式[]) => string,
-  ) {
-    super(
-      操作名称,
-      ((): any => {
-        throw new Error('递归构造子请通过 调用 方法执行')
-      }) as any,
-      纯文本格式化,
-      Latex格式化,
-    )
-    this.我的参数符号列表 = 参数符号列表
-    this.表达式体 = 构建体(this)
-  }
-
-  public override 调用(...参数: [...参数类型]): 返回值类型 {
-    let 当前表达式: 任意的表达式 = this.表达式体
-    for (let i = 0; i < this.我的参数符号列表.length; i++) {
-      let 当前符号 = this.我的参数符号列表[i]
-      if (当前符号 === undefined) throw new Error('意外的空值')
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      当前表达式 = 当前表达式.代换(当前符号.获得名称(), new 值(参数[i]))
-    }
-    return 当前表达式.求值()
-  }
-}

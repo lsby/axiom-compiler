@@ -6,29 +6,18 @@ import { Latex渲染器 } from './model/renderer/latex-renderer.js'
 let x = new 符号('x', z.number())
 let y = new 符号('y', z.number())
 
-let 参数 = new 数据([x, y])
-
-let 表达式1 = new 调用(加法, 参数)
-let 表达式2 = 表达式1.代换('x', new 值(10))
-let 最终表达式 = 表达式2.代换('y', new 值(20))
-
-console.log(最终表达式.求值()) // 输出 30
-console.log('最终表达式 纯文本:', 最终表达式.转纯文本())
-console.log('最终表达式 Latex:', 最终表达式.转Latex())
-
-// 测试复杂嵌套
-let 复杂表达式 = new 调用(
+let 表达式1 = new 调用(
   除法,
-  new 数据([new 调用(加法, new 数据([x, new 值(100)])), new 调用(乘法, new 数据([y, new 值(2)]))]),
+  new 数据([new 调用(加法, new 数据([x, new 值(50)])), new 调用(乘法, new 数据([y, new 值(2)]))]),
 )
-
-console.log('--- 复杂表达式 ---')
-console.log('纯文本:', 复杂表达式.转纯文本())
-console.log('Latex:', 复杂表达式.转Latex())
-
-await Latex渲染器.渲染并保存(复杂表达式.转Latex(), {
-  保存路径: './data/expression.png',
-  格式: 'png',
-  背景颜色: 'white',
-})
+console.log('表达式1 纯文本:', 表达式1.转纯文本())
+console.log('表达式1 Latex:', 表达式1.转Latex())
+await Latex渲染器.渲染并保存(表达式1.转Latex(), { 保存路径: './data/expression.png', 格式: 'png', 背景颜色: 'white' })
 console.log('图片已保存到 ./data/expression.png')
+
+let 表达式2 = 表达式1.代换('x', new 值(50))
+console.log('表达式2 纯文本:', 表达式2.转纯文本())
+
+let 表达式3 = 表达式2.代换('y', new 值(1))
+console.log('表达式3 纯文本:', 表达式3.转纯文本())
+console.log('表达式3 求值:', 表达式3.求值())

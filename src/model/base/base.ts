@@ -144,7 +144,7 @@ export class 调用<
     继承<计算数据返回值类型<参数类型>, 计算操作参数类型<操作类型>>,
     any,
     {
-      错误: '调用操作时参数类型不匹配'
+      错误: '调用参数类型不匹配'
       操作名称: 操作类型 extends 操作<infer N, any, any> ? N : '未知操作'
       期待的参数类型: 计算操作参数类型<操作类型>
       实际传入的参数类型: 计算数据返回值类型<参数类型>
@@ -166,5 +166,73 @@ export class 调用<
   }
   public override 求值(): 计算操作返回值类型<操作类型> {
     return this.操作.调用(...this.参数.求值().map((项: any) => 项.求值()))
+  }
+}
+
+// 条件表达式: 惰性求值的 if-then-else
+export class 条件表达式<条件符号 extends string, 真符号 extends string, 假符号 extends string, 返回值> extends 表达式<
+  条件符号 | 真符号 | 假符号,
+  返回值
+> {
+  public constructor(
+    private 条件: 表达式<条件符号, boolean>,
+    private 真分支: 表达式<真符号, 返回值>,
+    private 假分支: 表达式<假符号, 返回值>,
+  ) {
+    super()
+  }
+
+  public override 代换<S extends (条件符号 | 真符号 | 假符号) | (string & {}), R extends 任意的表达式>(
+    符号名: S,
+    替换物: R,
+  ): any {
+    return new 条件表达式(
+      this.条件.代换(符号名, 替换物),
+      this.真分支.代换(符号名, 替换物),
+      this.假分支.代换(符号名, 替换物),
+    )
+  }
+
+  public override 求值(): 返回值 {
+    return this.条件.求值() ? this.真分支.求值() : this.假分支.求值()
+  }
+
+  public 获得条件(): 表达式<条件符号, boolean> {
+    return this.条件
+  }
+  public 获得真分支(): 表达式<真符号, 返回值> {
+    return this.真分支
+  }
+  public 获得假分支(): 表达式<假符号, 返回值> {
+    return this.假分支
+  }
+}
+
+// 延迟调用: 持有操作引用和参数表达式, 求值时才执行调用
+export class 延迟调用<返回值类型> extends 表达式<any, 返回值类型> {
+  public constructor(
+    private 操作引用: 操作<any, any, 返回值类型>,
+    private 参数列表: 任意的表达式[],
+  ) {
+    super()
+  }
+
+  public override 代换<S extends string, R extends 任意的表达式>(符号名: S, 替换物: R): any {
+    return new 延迟调用(
+      this.操作引用,
+      this.参数列表.map((项) => 项.代换(符号名, 替换物)),
+    )
+  }
+
+  public override 求值(): 返回值类型 {
+    let 求值后参数 = this.参数列表.map((项) => 项.求值())
+    return this.操作引用.调用(...求值后参数)
+  }
+
+  public 获得操作(): 操作<any, any, 返回值类型> {
+    return this.操作引用
+  }
+  public 获得参数列表(): 任意的表达式[] {
+    return this.参数列表
   }
 }

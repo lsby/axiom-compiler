@@ -25,8 +25,7 @@ await Latex渲染器.渲染并保存(我的函数1.输出Latex(), { 保存路径
 console.log('除法 求值:', 我的函数1.代换('a', new 值(10)).代换('b', new 值(20)).代换('c', new 值(3)).求值())
 
 // 排序
-let 排序函数 = new 函数(排序, new 数据([new 符号('arr', z.number().array())]))
-console.log('排序函数 文本:', 排序函数.输出文本())
-console.log('排序函数 latex:', 排序函数.输出Latex())
-await Latex渲染器.渲染并保存(排序函数.输出Latex(), { 保存路径: './data/img02.png', 格式: 'png', 背景颜色: 'white' })
-console.log('排序函数 求值:', 排序函数.代换('arr', new 值([1, 3, 6, 2, 5, 9])).求值())
+console.log('排序函数 文本:', 排序.输出文本())
+console.log('排序函数 latex:', 排序.输出Latex())
+await Latex渲染器.渲染并保存(排序.输出Latex(), { 保存路径: './data/img02.png', 格式: 'png', 背景颜色: 'white' })
+console.log('排序函数 求值:', 排序.代换('arr', new 值([1, 3, 6, 2, 5, 9])).求值())

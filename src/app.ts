@@ -1,9 +1,10 @@
+import z from 'zod/v3'
 import { 值, 数据, 符号, 调用 } from './model/base/base.js'
 import { 乘法, 加法, 除法 } from './model/math/math.js'
 import { Latex渲染器 } from './model/renderer/latex-renderer.js'
 
-let x = new 符号<'x', number>('x')
-let y = new 符号<'y', number>('y')
+let x = new 符号('x', z.number())
+let y = new 符号('y', z.number())
 
 let 参数 = new 数据([x, y])
 

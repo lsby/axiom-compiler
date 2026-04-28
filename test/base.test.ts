@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import z from 'zod/v3'
 import { 值, 操作, 数据, 符号, 调用 } from '../src/model/base/base.js'
 
 let 测试加法 = new 操作(
@@ -31,7 +32,7 @@ describe('基础模型单元测试', () => {
   })
 
   it('符号单元测试', () => {
-    let x = new 符号<'x', number>('x')
+    let x = new 符号('x', z.number())
     expect(x.转纯文本()).toBe('x')
     expect(x.转Latex()).toBe('x')
 
@@ -41,8 +42,8 @@ describe('基础模型单元测试', () => {
   })
 
   it('数据单元测试', () => {
-    let x = new 符号<'x', number>('x')
-    let y = new 符号<'y', number>('y')
+    let x = new 符号('x', z.number())
+    let y = new 符号('y', z.number())
     let 数组 = new 数据([x, y])
 
     expect(数组.转纯文本()).toBe('x, y')
@@ -58,8 +59,8 @@ describe('基础模型单元测试', () => {
   })
 
   it('嵌套调用与代换测试', () => {
-    let x = new 符号<'x', number>('x')
-    let y = new 符号<'y', number>('y')
+    let x = new 符号('x', z.number())
+    let y = new 符号('y', z.number())
 
     // (x + 10) * y
     let 表达式 = new 调用(测试乘法, new 数据([new 调用(测试加法, new 数据([x, new 值(10)])), y]))

@@ -58,7 +58,7 @@ let 排序构造子 = new 递归构造子<'sort', [number[]], number[]>(
   (参数): string => `sort(${渲染为文本(参数[0])})`,
   (参数): string => String.raw`
   \begin{aligned}
-    & ${插入构造子.格式化Latex([new 符号('x', z.number()), new 符号('arr', z.number().array())])} \\
+    & ${插入.输出Latex()} \\
     & \mathrm{sort}(${渲染为Latex(参数[0])}) =
       \begin{cases}
         [] & \text{if } ${渲染为Latex(参数[0])} = [] \\

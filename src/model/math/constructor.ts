@@ -1,15 +1,5 @@
 import { 任意的表达式, 值, 操作, 符号, 表达式 } from '../base/base.js'
 
-export function 渲染为文本(项: 任意的表达式 | undefined): string {
-  if (项 === undefined) throw new Error('渲染目标不存在')
-  return 项.输出文本(true)
-}
-
-export function 渲染为Latex(项: 任意的表达式 | undefined): string {
-  if (项 === undefined) throw new Error('渲染目标不存在')
-  return 项.输出Latex(true)
-}
-
 // 算子, 是计算的基本模块
 // 需要提供 名称, 实际逻辑, 纯文本和latex 的渲染结果
 export class 算子<操作名称 extends string, const 参数类型 extends any[], 返回值类型> extends 操作<
@@ -61,34 +51,34 @@ export type 计算算子参数类型<A> = A extends 算子<any, infer Arr, any> 
 export let 加法算子 = new 算子(
   '加',
   (a: number, b: number): number => a + b,
-  (参数): string => `(${渲染为文本(参数[0])} + ${渲染为文本(参数[1])})`,
-  (参数): string => `(${渲染为Latex(参数[0])} + ${渲染为Latex(参数[1])})`,
+  (参数): string => `(${参数[0]?.输出文本(true) ?? ''} + ${参数[1]?.输出文本(true) ?? ''})`,
+  (参数): string => `(${参数[0]?.输出Latex(true) ?? ''} + ${参数[1]?.输出Latex(true) ?? ''})`,
 )
 export let 减法算子 = new 算子(
   '减',
   (a: number, b: number): number => a - b,
-  (参数): string => `(${渲染为文本(参数[0])} - ${渲染为文本(参数[1])})`,
-  (参数): string => `(${渲染为Latex(参数[0])} - ${渲染为Latex(参数[1])})`,
+  (参数): string => `(${参数[0]?.输出文本(true) ?? ''} - ${参数[1]?.输出文本(true) ?? ''})`,
+  (参数): string => `(${参数[0]?.输出Latex(true) ?? ''} - ${参数[1]?.输出Latex(true) ?? ''})`,
 )
 export let 乘法算子 = new 算子(
   '乘',
   (a: number, b: number): number => a * b,
-  (参数): string => `(${渲染为文本(参数[0])} × ${渲染为文本(参数[1])})`,
-  (参数): string => `(${渲染为Latex(参数[0])} \\times ${渲染为Latex(参数[1])})`,
+  (参数): string => `(${参数[0]?.输出文本(true) ?? ''} × ${参数[1]?.输出文本(true) ?? ''})`,
+  (参数): string => `(${参数[0]?.输出Latex(true) ?? ''} \\times ${参数[1]?.输出Latex(true) ?? ''})`,
 )
 export let 除法算子 = new 算子(
   '除',
   (a: number, b: number): number => a / b,
-  (参数): string => `(${渲染为文本(参数[0])} / ${渲染为文本(参数[1])})`,
-  (参数): string => `\\frac{${渲染为Latex(参数[0])}}{${渲染为Latex(参数[1])}}`,
+  (参数): string => `(${参数[0]?.输出文本(true) ?? ''} / ${参数[1]?.输出文本(true) ?? ''})`,
+  (参数): string => `\\frac{${参数[0]?.输出Latex(true) ?? ''}}{${参数[1]?.输出Latex(true) ?? ''}}`,
 )
 
 // 数组原子算子
 export let 判空 = new 算子(
   'isEmpty',
   (arr: number[]): boolean => arr.length === 0,
-  (参数): string => `isEmpty(${渲染为文本(参数[0])})`,
-  (参数): string => String.raw`\mathrm{isEmpty}(${渲染为Latex(参数[0])})`,
+  (参数): string => `isEmpty(${参数[0]?.输出文本(true) ?? ''})`,
+  (参数): string => String.raw`\mathrm{isEmpty}(${参数[0]?.输出Latex(true) ?? ''})`,
 )
 export let 头 = new 算子(
   'head',
@@ -97,24 +87,24 @@ export let 头 = new 算子(
     if (首项 === undefined) throw new Error('空数组无法取头')
     return 首项
   },
-  (参数): string => `head(${渲染为文本(参数[0])})`,
-  (参数): string => String.raw`\mathrm{head}(${渲染为Latex(参数[0])})`,
+  (参数): string => `head(${参数[0]?.输出文本(true) ?? ''})`,
+  (参数): string => String.raw`\mathrm{head}(${参数[0]?.输出Latex(true) ?? ''})`,
 )
 export let 尾 = new 算子(
   'tail',
   (arr: number[]): number[] => arr.slice(1),
-  (参数): string => `tail(${渲染为文本(参数[0])})`,
-  (参数): string => String.raw`\mathrm{tail}(${渲染为Latex(参数[0])})`,
+  (参数): string => `tail(${参数[0]?.输出文本(true) ?? ''})`,
+  (参数): string => String.raw`\mathrm{tail}(${参数[0]?.输出Latex(true) ?? ''})`,
 )
 export let 前置 = new 算子(
   'cons',
   (x: number, arr: number[]): number[] => [x, ...arr],
-  (参数): string => `cons(${渲染为文本(参数[0])}, ${渲染为文本(参数[1])})`,
-  (参数): string => String.raw`\mathrm{cons}(${渲染为Latex(参数[0])}, ${渲染为Latex(参数[1])})`,
+  (参数): string => `cons(${参数[0]?.输出文本(true) ?? ''}, ${参数[1]?.输出文本(true) ?? ''})`,
+  (参数): string => String.raw`\mathrm{cons}(${参数[0]?.输出Latex(true) ?? ''}, ${参数[1]?.输出Latex(true) ?? ''})`,
 )
 export let 小于等于 = new 算子(
   'leq',
   (a: number, b: number): boolean => a <= b,
-  (参数): string => `(${渲染为文本(参数[0])} <= ${渲染为文本(参数[1])})`,
-  (参数): string => `(${渲染为Latex(参数[0])} \\le ${渲染为Latex(参数[1])})`,
+  (参数): string => `(${参数[0]?.输出文本(true) ?? ''} <= ${参数[1]?.输出文本(true) ?? ''})`,
+  (参数): string => `(${参数[0]?.输出Latex(true) ?? ''} \\le ${参数[1]?.输出Latex(true) ?? ''})`,
 )

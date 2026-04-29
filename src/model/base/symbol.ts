@@ -1,9 +1,9 @@
 import z from 'zod/v3'
-import { 任意的表达式, 表达式, 计算表达式包含符号 } from './expression.js'
+import { 任意的表达式, 表达式, 计算表达式符号映射 } from './expression.js'
 
 // 符号是占位符
 export class 符号<符号名称 extends string, 预期类型zod extends z.ZodTypeAny> extends 表达式<
-  符号名称,
+  { [K in 符号名称]: z.infer<预期类型zod> },
   z.infer<预期类型zod>
 > {
   public constructor(
@@ -13,11 +13,14 @@ export class 符号<符号名称 extends string, 预期类型zod extends z.ZodTy
     super()
   }
 
-  public override 代换<S extends 符号名称 | (string & {}), R extends 任意的表达式>(
+  public override 代换<
+    S extends 符号名称 | (string & {}),
+    R extends 表达式<any, S extends 符号名称 ? z.infer<预期类型zod> : any>,
+  >(
     符号名: S,
     替换物: R,
-  ): 表达式<Exclude<符号名称, S> | 计算表达式包含符号<R>, z.infer<预期类型zod>> {
-    if (this.符号名称 === 符号名) return 替换物
+  ): 表达式<Omit<{ [K in 符号名称]: z.infer<预期类型zod> }, S> & 计算表达式符号映射<R>, z.infer<预期类型zod>> {
+    if (this.符号名称 === (符号名 as any)) return 替换物 as any
     return this as any
   }
   public override 求值(): never {

@@ -1,25 +1,25 @@
-import { 任意的表达式, 表达式, 计算表达式包含符号 } from './expression.js'
+import { 任意的表达式, 表达式, 计算表达式符号映射 } from './expression.js'
 import { 不动点 } from './fixed-point.js'
 import { 操作 } from './operation.js'
 import { 符号 } from './symbol.js'
 
 // 延迟调用: 持有操作表达式和参数表达式, 求值时才执行调用
 // 操作位可以是操作或不动点
-export class 延迟调用<包含符号 extends string, 返回值类型> extends 表达式<包含符号, 返回值类型> {
+export class 延迟调用<符号映射 extends Record<string, any>, 返回值类型> extends 表达式<符号映射, 返回值类型> {
   public constructor(
-    private 操作表达式: 表达式<包含符号, any>,
-    private 参数列表: 表达式<包含符号, any>[],
+    private 操作表达式: 表达式<any, any>,
+    private 参数列表: 表达式<any, any>[],
   ) {
     super()
   }
 
-  public override 代换<S extends string, R extends 任意的表达式>(
-    符号名: S,
-    替换物: R,
-  ): 延迟调用<Exclude<包含符号, S> | 计算表达式包含符号<R>, 返回值类型> {
+  public override 代换<
+    S extends Extract<keyof 符号映射, string> | (string & {}),
+    R extends 表达式<any, S extends keyof 符号映射 ? 符号映射[S] : any>,
+  >(符号名: S, 替换物: R): 延迟调用<Omit<符号映射, S> & 计算表达式符号映射<R>, 返回值类型> {
     return new 延迟调用(
-      this.操作表达式.代换(符号名, 替换物),
-      this.参数列表.map((项) => 项.代换(符号名, 替换物)),
+      this.操作表达式.代换(符号名 as any, 替换物),
+      this.参数列表.map((项) => 项.代换(符号名 as any, 替换物)),
     ) as any
   }
 
@@ -40,7 +40,7 @@ export class 延迟调用<包含符号 extends string, 返回值类型> extends 
     return this.参数列表
   }
 
-  public override 输出文本(嵌套?: boolean): string {
+  public override 输出文本(_嵌套?: boolean): string {
     let 操作目标 = this.操作表达式
     if (操作目标 instanceof 操作) return 操作目标.格式化纯文本(this.参数列表)
     if (操作目标 instanceof 不动点) return 操作目标.格式化纯文本(this.参数列表)

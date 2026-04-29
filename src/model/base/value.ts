@@ -1,6 +1,6 @@
 import { 任意的表达式, 表达式 } from './expression.js'
 
-export class 值<值类型> extends 表达式<never, 值类型> {
+export class 值<值类型> extends 表达式<{}, 值类型> {
   public constructor(private 值: 值类型) {
     super()
   }
@@ -8,7 +8,7 @@ export class 值<值类型> extends 表达式<never, 值类型> {
   public override 代换<S extends never | (string & {}), R extends 任意的表达式>(
     _符号名: S,
     _替换物: R,
-  ): 表达式<never, 值类型> {
+  ): 表达式<{}, 值类型> {
     return this
   }
   public override 求值(): 值类型 {

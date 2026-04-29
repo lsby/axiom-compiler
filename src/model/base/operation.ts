@@ -2,7 +2,7 @@ import { 任意的表达式, 表达式 } from './expression.js'
 import { 符号 } from './symbol.js'
 
 // 操作类似函数, 表示一种计算
-export class 操作<操作名称 extends string, const 参数类型 extends any[], 返回值类型> extends 表达式<never, never> {
+export class 操作<操作名称 extends string, const 参数类型 extends any[], 返回值类型> extends 表达式<{}, never> {
   public constructor(
     protected 操作名称: 操作名称,
     private 实现: (...参数: [...参数类型]) => 返回值类型,
@@ -22,7 +22,7 @@ export class 操作<操作名称 extends string, const 参数类型 extends any[
   public override 代换<S extends never | (string & {}), R extends 任意的表达式>(
     _符号名: S,
     _替换物: R,
-  ): 表达式<never, never> {
+  ): 表达式<{}, never> {
     return this
   }
   public override 求值(): never {

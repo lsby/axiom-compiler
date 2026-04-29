@@ -17,10 +17,10 @@ export class 算子<操作名称 extends string, const 参数类型 extends any[
   参数类型,
   返回值类型
 > {
-  public static 从表达式创建<N extends string, S extends string, R>(
+  public static 从表达式创建<N extends string, M extends Record<string, any>, R>(
     名称: N,
-    参数符号: 符号<S, any>[],
-    体: 表达式<S, R>,
+    参数符号: 符号<any, any>[],
+    体: 表达式<M, R>,
   ): 算子<N, any[], R> {
     return new 算子(
       名称,
@@ -29,7 +29,7 @@ export class 算子<操作名称 extends string, const 参数类型 extends any[
         for (let i = 0; i < 参数符号.length; i++) {
           let 符号 = 参数符号[i]
           if (符号 === undefined) throw new Error('意外的空值')
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
           e = e.代换(符号.获得名称(), new 值(args[i]))
         }
         return e.求值() as R

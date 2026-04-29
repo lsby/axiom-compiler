@@ -1,11 +1,11 @@
-import { 任意的表达式, 表达式, 计算表达式包含符号 } from './expression.js'
+import { 任意的表达式, 表达式, 计算表达式符号映射 } from './expression.js'
 import { 符号 } from './symbol.js'
 import { 值 } from './value.js'
 
 // 不动点: fix(自引用符号, 参数符号列表, 体)
 // 自引用在应用时局部代换为自身实例, 无需全局注册表
-export class 不动点<自引用符号 extends string, 体符号 extends string, 返回值> extends 表达式<
-  Exclude<体符号, 自引用符号>,
+export class 不动点<自引用符号 extends string, 体映射 extends Record<string, any>, 返回值> extends 表达式<
+  Omit<体映射, 自引用符号>,
   返回值
 > {
   private 绑定了自引用的体: 表达式<any, 返回值>
@@ -13,15 +13,15 @@ export class 不动点<自引用符号 extends string, 体符号 extends string,
   public constructor(
     private 自引用符号名: 自引用符号,
     private 参数符号列表: 符号<any, any>[],
-    private 体: 表达式<体符号, 返回值>,
+    private 体: 表达式<any, 返回值>,
     private 显示名称?: string,
     private 纯文本格式化?: (参数: 任意的表达式[]) => string,
     private Latex格式化?: (参数: 任意的表达式[]) => string,
   ) {
     super()
     // 预先将体内的自引用符号代换为自身, 避免每次应用时重复代换
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    this.绑定了自引用的体 = this.体.代换(this.自引用符号名, this as any)
+
+    this.绑定了自引用的体 = this.体.代换(this.自引用符号名 as any, this as any)
   }
 
   public 获得显示名称(): string | undefined {
@@ -38,10 +38,10 @@ export class 不动点<自引用符号 extends string, 体符号 extends string,
     return this.输出定义Latex()
   }
 
-  public override 代换<S extends Exclude<体符号, 自引用符号> | (string & {}), R extends 任意的表达式>(
-    符号名: S,
-    替换物: R,
-  ): 不动点<自引用符号, Exclude<体符号, S> | 计算表达式包含符号<R>, 返回值> {
+  public override 代换<
+    S extends Extract<keyof Omit<体映射, 自引用符号>, string> | (string & {}),
+    R extends 表达式<any, S extends keyof Omit<体映射, 自引用符号> ? Omit<体映射, 自引用符号>[S] : any>,
+  >(符号名: S, 替换物: R): 表达式<Omit<体映射, S> & 计算表达式符号映射<R>, 返回值> {
     // 保护自引用符号和参数符号
     if ((符号名 as string) === (this.自引用符号名 as string)) return this as any
     let 是参数符号 = this.参数符号列表.some((符号) => 符号.获得名称() === (符号名 as string))
@@ -50,7 +50,7 @@ export class 不动点<自引用符号 extends string, 体符号 extends string,
     return new 不动点(
       this.自引用符号名,
       this.参数符号列表,
-      this.体.代换(符号名, 替换物),
+      this.体.代换(符号名 as any, 替换物),
       this.显示名称,
       this.纯文本格式化,
       this.Latex格式化,
@@ -67,7 +67,7 @@ export class 不动点<自引用符号 extends string, 体符号 extends string,
     for (let i = 0; i < this.参数符号列表.length; i++) {
       let 当前符号 = this.参数符号列表[i]
       if (当前符号 === undefined) throw new Error('意外的空值')
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
       当前表达式 = 当前表达式.代换(当前符号.获得名称(), new 值(参数值[i]))
     }
     return 当前表达式.求值()
@@ -79,7 +79,7 @@ export class 不动点<自引用符号 extends string, 体符号 extends string,
   public 获得参数符号列表(): 符号<any, any>[] {
     return this.参数符号列表
   }
-  public 获得体(): 表达式<体符号, 返回值> {
+  public 获得体(): 表达式<体映射, 返回值> {
     return this.体
   }
 

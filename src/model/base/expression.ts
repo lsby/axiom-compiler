@@ -1,13 +1,11 @@
 // 所有一切都是表达式
-export abstract class 表达式<包含符号 extends string, 返回值> {
-  declare protected _类型保持: [包含符号, 返回值]
+export abstract class 表达式<符号映射 extends Record<string, any>, 返回值> {
+  declare protected _类型保持: (输入: 符号映射) => 返回值
 
-  // todo: 可以考虑限制替换物的类型 extends 表达式<any, 计算符号返回值<S>>>
-  public abstract 代换<S extends 包含符号 | (string & {}), R extends 任意的表达式>(符号名: S, 替换物: R): any // 防止无限递归检查
-  public abstract 代换<S extends 包含符号 | (string & {}), R extends 任意的表达式>(
-    符号名: S,
-    替换物: R,
-  ): 表达式<Exclude<包含符号, S> | 计算表达式包含符号<R>, 返回值>
+  public abstract 代换<
+    S extends Extract<keyof 符号映射, string> | (string & {}),
+    R extends 表达式<any, S extends keyof 符号映射 ? 符号映射[S] : any>,
+  >(符号名: S, 替换物: R): 表达式<Omit<符号映射, S> & 计算表达式符号映射<R>, 返回值>
 
   public abstract 求值(): 返回值
 
@@ -68,24 +66,28 @@ export abstract class 表达式<包含符号 extends string, 返回值> {
   }
 }
 export type 任意的表达式 = 表达式<any, any>
-export type 计算表达式包含符号<A> = A extends 表达式<infer X, any> ? X : never
+export type 计算符号类型<M, S> = S extends keyof M ? M[S] : any
+export type 计算表达式符号映射<A> = A extends 表达式<infer X, any> ? X : never
 export type 计算表达式返回值<A> = A extends 表达式<any, infer X> ? X : never
 export type 移除表达式符号<A, S extends string> =
-  A extends 表达式<infer 包含符号, infer 返回值> ? 表达式<Exclude<包含符号, S>, 返回值> : never
-export type 添加表达式符号<输入表达式, 符号 extends string> =
-  输入表达式 extends 表达式<infer 包含符号, infer 返回值> ? 表达式<包含符号 | 符号, 返回值> : never
-export type 替换表达式符号<输入表达式, 旧符号 extends string, 新符号 extends string> = 添加表达式符号<
+  A extends 表达式<infer 符号映射, infer 返回值> ? 表达式<Omit<符号映射, S>, 返回值> : never
+export type 添加表达式符号<输入表达式, 符号 extends string, 类型> =
+  输入表达式 extends 表达式<infer 符号映射, infer 返回值> ? 表达式<符号映射 & { [K in 符号]: 类型 }, 返回值> : never
+export type 替换表达式符号<输入表达式, 旧符号 extends string, 新符号 extends string, 类型> = 添加表达式符号<
   移除表达式符号<输入表达式, 旧符号>,
-  新符号
+  新符号,
+  类型
 >
 
-export type 计算表达式们包含符号<表达式> = 表达式 extends []
-  ? never
-  : 表达式 extends [infer X, ...infer XS]
-    ? 计算表达式包含符号<X> | 计算表达式们包含符号<XS>
-    : never
-export type 替换表达式们符号<表达式们, 旧符号 extends string, 新符号 extends string> = 表达式们 extends []
+export type 计算表达式们符号映射<表达式集> = 表达式集 extends []
+  ? {}
+  : 表达式集 extends [infer X, ...infer XS]
+    ? 计算表达式符号映射<X> & 计算表达式们符号映射<XS>
+    : 表达式集 extends (infer T)[]
+      ? 计算表达式符号映射<T>
+      : never
+export type 替换表达式们符号<表达式们, 旧符号 extends string, 新符号 extends string, 类型> = 表达式们 extends []
   ? 表达式们
   : 表达式们 extends [infer X, ...infer XS]
-    ? [替换表达式符号<X, 旧符号, 新符号>, ...替换表达式们符号<XS, 旧符号, 新符号>]
+    ? [替换表达式符号<X, 旧符号, 新符号, 类型>, ...替换表达式们符号<XS, 旧符号, 新符号, 类型>]
     : never

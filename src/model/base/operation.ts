@@ -93,6 +93,12 @@ export class 操作<操作名称 extends string, const 参数类型 extends any[
   public override 收集依赖(池: Set<任意的表达式>): void {
     if (池.has(this)) return
     池.add(this)
+    if (this.选项?.体 !== undefined) {
+      this.选项.体.收集依赖(池)
+    }
+    // 保证依赖在自身之前
+    池.delete(this)
+    池.add(this)
   }
 }
 

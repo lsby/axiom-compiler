@@ -44,14 +44,14 @@ export class 条件表达式<条件符号 extends string, 真符号 extends stri
   }
 
   public override 输出文本(嵌套?: boolean): string {
-    return `if(${this.条件.输出文本(true)}, ${this.真分支.输出文本(true)}, ${this.假分支.输出文本(true)})`
+    return `(${this.条件.输出文本(true)} ? ${this.真分支.输出文本(true)} : ${this.假分支.输出文本(true)})`
   }
   public override 输出Latex(嵌套?: boolean): string {
     return this.获得完整输出组(嵌套, true)
   }
 
   protected override 输出主体文本(): string {
-    return `if(${this.条件.输出文本(true)}, ${this.真分支.输出文本(true)}, ${this.假分支.输出文本(true)})`
+    return `(${this.条件.输出文本(true)} ? ${this.真分支.输出文本(true)} : ${this.假分支.输出文本(true)})`
   }
   protected override 输出主体Latex(): string {
     let 列表 = this.获得Latex分支列表()

@@ -43,6 +43,12 @@ export class 数据<const 值类型 extends 任意的表达式[]> extends 表达
   public override 收集依赖(池: Set<任意的表达式>): void {
     this.值.forEach((v) => v.收集依赖(池))
   }
+
+  public override 收集符号(池: Set<任意的表达式>): void {
+    for (let 项 of this.值) {
+      项.收集符号(池)
+    }
+  }
 }
 export type 任意的数据 = 数据<any>
 export type 计算数据值类型<T> = T extends 数据<infer Arr> ? Arr : never

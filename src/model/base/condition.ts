@@ -72,4 +72,10 @@ export class 条件表达式<
     this.真分支.收集依赖(池)
     this.假分支.收集依赖(池)
   }
+
+  public override 收集符号(池: Set<任意的表达式>): void {
+    this.条件.收集符号(池)
+    this.真分支.收集符号(池)
+    this.假分支.收集符号(池)
+  }
 }

@@ -14,6 +14,8 @@ export abstract class 表达式<符号映射 extends Record<string, any>, 返回
 
   public abstract 收集依赖(池: Set<任意的表达式>): void
 
+  public abstract 收集符号(池: Set<任意的表达式>): void
+
   protected abstract 输出主体文本(): string
   protected abstract 输出主体Latex(): string
 

@@ -90,6 +90,10 @@ export class 操作<操作名称 extends string, const 参数类型 extends any[
     return `\\mathrm{${this.操作名称}}(${参数.map((p) => p.输出Latex(true)).join(', ')})`
   }
 
+  public override 收集符号(_池: Set<任意的表达式>): void {
+    // 操作本身不需要收集符号
+  }
+
   public override 收集依赖(池: Set<任意的表达式>): void {
     if (池.has(this)) return
     池.add(this)

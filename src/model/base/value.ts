@@ -33,4 +33,8 @@ export class 值<值类型> extends 表达式<{}, 值类型> {
   }
 
   public override 收集依赖(_池: Set<任意的表达式>): void {}
+
+  public override 收集符号(_池: Set<任意的表达式>): void {
+    // 值不需要收集符号
+  }
 }

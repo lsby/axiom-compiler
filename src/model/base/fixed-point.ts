@@ -134,6 +134,17 @@ export class 不动点<自引用符号 extends string, 体映射 extends Record<
     return `\\mathrm{${this.显示名称 ?? this.自引用符号名}}(${参数文本}) &= ${this.体.输出Latex(true)}`
   }
 
+  public override 收集符号(池: Set<任意的表达式>): void {
+    let 临时池 = new Set<任意的表达式>()
+    this.体.收集符号(临时池)
+    for (let 项 of 临时池) {
+      if (项 === (this as any)) continue
+      if (项 instanceof 符号 && 项.获得名称() === (this.自引用符号名 as string)) continue
+      if (this.参数符号列表.some((s) => s === 项)) continue
+      池.add(项)
+    }
+  }
+
   public override 收集依赖(池: Set<任意的表达式>): void {
     if (池.has(this)) return
     池.add(this)

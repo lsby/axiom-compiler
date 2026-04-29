@@ -45,4 +45,8 @@ export class 符号<符号名称 extends string, 预期类型zod extends z.ZodTy
   }
 
   public override 收集依赖(_池: Set<任意的表达式>): void {}
+
+  public override 收集符号(池: Set<任意的表达式>): void {
+    池.add(this)
+  }
 }

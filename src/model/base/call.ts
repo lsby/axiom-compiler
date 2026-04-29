@@ -50,6 +50,10 @@ export class 调用<
     return this.操作.格式化Latex(this.参数.获得各项())
   }
 
+  public override 收集符号(池: Set<任意的表达式>): void {
+    this.参数.收集符号(池)
+  }
+
   public override 收集依赖(池: Set<任意的表达式>): void {
     this.操作.收集依赖(池)
     this.参数.收集依赖(池)

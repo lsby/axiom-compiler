@@ -69,6 +69,12 @@ export class 延迟调用<符号映射 extends Record<string, any>, 返回值类
     return `\\text{<延迟调用>}`
   }
 
+  public override 收集符号(池: Set<任意的表达式>): void {
+    for (let 项 of this.参数列表) {
+      项.收集符号(池)
+    }
+  }
+
   public override 收集依赖(池: Set<任意的表达式>): void {
     this.操作表达式.收集依赖(池)
     this.参数列表.forEach((p) => p.收集依赖(池))

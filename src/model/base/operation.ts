@@ -62,14 +62,25 @@ export class 操作<操作名称 extends string, const 参数类型 extends any[
       let 参数文本 = this.选项.参数符号.map((p) => p.输出文本(true)).join(', ')
       return `let ${this.操作名称} = (${参数文本}) => ${this.选项.体.输出文本(true)}`
     }
-    return `let ${this.操作名称} = <算子实现>`
+    return `let ${this.操作名称} = (${this.修正实现字符串(this.实现.toString(), false)})`
   }
   public 输出定义Latex(): string {
     if (this.选项?.体 !== undefined && this.选项.参数符号 !== undefined) {
       let 参数文本 = this.选项.参数符号.map((p) => p.输出Latex(true)).join(', ')
       return `\\mathrm{${this.操作名称}}(${参数文本}) &= ${this.选项.体.输出Latex(true)}`
     }
-    return `\\mathrm{${this.操作名称}} &= [\\text{operator implementation}]`
+    return `\\mathrm{${this.操作名称}} &= \\text{(${this.修正实现字符串(this.实现.toString(), true)})}`
+  }
+
+  private 修正实现字符串(文本: string, 是Latex: boolean): string {
+    let 结果 = 文本.replace(/\\u([0-9a-fA-F]{4})/g, (_: string, 十六进制: string): string =>
+      String.fromCharCode(parseInt(十六进制, 16)),
+    )
+    if (是Latex === true) {
+      结果 = 结果.replace(/\\/g, '\\textbackslash ')
+      结果 = 结果.replace(/([{}%&_$#^~])/g, '\\$1')
+    }
+    return 结果
   }
 
   public 格式化纯文本(参数: 任意的表达式[]): string {
